@@ -1,11 +1,20 @@
 "use client";
+import GenerateBtn from "@/components/GenerateBtn";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Home() {
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState<string>("");
+  const [output, setOutput] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const generateText = async () => {
+    if (!input.trim()) {
+      toast.error("Please enter a historical topic!");
+      return;
+    }
+    setLoading(true);
     const prompt = `Write a short humorous and sarcastic historical joke about: ${input}`;
     try {
       const response = await fetch("/api/generate", {
@@ -21,31 +30,31 @@ export default function Home() {
       if (response.ok) {
         setOutput(data.output);
       } else {
-        setOutput(data.error || "An error occurred.");
+        toast.error("Something went wrong!");
       }
     } catch (error) {
-      console.error("Error:", error);
-      setOutput("An error occurred while generating the text.");
+      toast.error("Something went wrong!");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="flex flex-col justify-center items-center h-screen gap-6">
+    <main className="flex flex-col justify-center items-center h-[90vh] gap-6">
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Enter any historical topic"
-        className="border border-zinc-400 w-[330px] px-4 py-4 rounded-md placeholder-slate-400 text-black focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:invalid:ring-pink-500"
+        className="border border-gray-400 w-[330px] px-4 py-4 rounded-md placeholder-slate-400 text-black focus:outline-none focus:border-none focus:ring-2 focus:ring-gray-400 "
       />
-      <button
-        onClick={generateText}
-        className="px-4 py-2 rounded-md hover:scale-105 transition-all ease-in-out bg-sky-500 text-white"
-      >
-        Generate Joke
-      </button>
+      <GenerateBtn
+        text="Generate Joke"
+        onclick={generateText}
+        loading={loading}
+      />
       {output && (
-        <div className="max-w-[450px] h-auto p-4 rounded-md shadow-md border-zinc-400 bg-green-800 text-white">
+        <div className="max-w-[450px] h-auto p-4 rounded-md shadow-md border border-gray-400 bg-zinc-100 text-black text-center">
           {output}
         </div>
       )}

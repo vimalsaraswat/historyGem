@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const plexMono = IBM_Plex_Mono({
   weight: "400",
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${plexMono.className} antialiased`}>{children}</body>
+      <body className={`${plexMono.className} antialiased`}>
+        <Toaster position="top-center" />
+        {children}
+      </body>
     </html>
   );
 }
